@@ -1,9 +1,8 @@
 from mysql.connector import MySQLConnection, Error
 from python_mysql_dbconfig import read_db_config
 
-
+# Funcion que establece la conexion con la base de datos
 def connect():
-    """ Connect to MySQL database """
 
     db_config = read_db_config()
     conn = None
