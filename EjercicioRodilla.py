@@ -12,8 +12,6 @@ import math
 import connect2
 import python_mysql_dbconfig as db
 
-
-buzzer=18
 # Token del dispositivo y hostname usado para conexión con Thingsboard
 ACCESS_TOKEN='dKyiMZ4zjM01jhiHt7J0'
 broker="demo.thingsboard.io"
@@ -23,11 +21,11 @@ bus = smbus.SMBus(1)
 Device_Address1 = 0x68
 Device_Address2 = 0x69
 
-
+buzzer=18
 idsession=10
-
 contador=0
 now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 # Registros de MPU6050 y las direcciones asociadas a cada uno.
 powerManagementRegister = 0x6B
 sampleRateDividerRegister = 0x19
@@ -80,7 +78,6 @@ client1.on_publish = on_publish
 client1.username_pw_set(ACCESS_TOKEN)
 client1.connect(broker,port,keepalive=60)
 
-
 # Funcion que realiza la escritura en los registros de ambos acelerometros
 def MPU_Init():
   bus.write_byte_data(Device_Address1, sampleRateDividerRegister, 7)
@@ -131,39 +128,29 @@ def threadDelayFunction():
     time.sleep(20)
     isTimeLimit = True
 
+# Funcion para calcular la distancia usando el sensor correspondiente
 def distance():
-    # set Trigger to HIGH
     IO.output(37, True)
- 
-    # set Trigger after 0.01ms to LOW
     time.sleep(0.00001)
     IO.output(37, False)
- 
+
     StartTime = time.time()
     StopTime = time.time()
- 
-    # save StartTime
+
     while IO.input(33) == 0:
         StartTime = time.time()
-        
-    # save time of arrival
-    
+
     while IO.input(33) == 1:
         StopTime = time.time()
- 
-    # time difference between start and arrival
+
     TimeElapsed = StopTime - StartTime
-    # multiply with the sonic speed (34300 cm/s)
-    # and divide by 2, because there and back
     distance = (TimeElapsed * 34300) / 2
- 
     return distance
 
-        
+# Funcion que inserta en la base de datos una nueva sesion de ejercicio       
 def insertExerciseSession(idExerciseSession,idUser,idSessionType,date):
     query = "INSERT INTO SesionEjercicio(idSesionEjercicio,idUsuario,idTipoSesion,fecha)" \
             "VALUES(%s,%s,%s,%s)"
-    
     args = (idExerciseSession,idUser,idSessionType,date)
 
     try:
@@ -179,7 +166,8 @@ def insertExerciseSession(idExerciseSession,idUser,idSessionType,date):
     finally:
         cursor.close()
         conn.close()
-        
+
+# Funcion que inserta en la base de datos los datos de una sesion de ejercicio de rodilla       
 def insertDataWrist(idExerciseSession,data1,data2,data3):
     query = "INSERT INTO Rodilla(idSesionEjercicio,maxDistancia,minIncRodilla,minIncPierna)VALUES(%s,%s,%s,%s)"
     
@@ -198,8 +186,7 @@ def insertDataWrist(idExerciseSession,data1,data2,data3):
     finally:
         cursor.close()
         conn.close()    
-           
-    
+ 
 x = threading.Thread(target=threadDelayFunction) 
 x.start()                
 time.sleep(1)
@@ -321,12 +308,11 @@ while(isTimeLimit == False):
     time.sleep(0.05)
 
 
-if (isTimeLimit == True): 
+if (isTimeLimit == True):
     IO.output(15, False)
     IO.output(7, False)
     print('El ejercicio ha finalizado')
-
-     
+   
 data = {'Giro Acelerometro 1 X': gxValuesAcc1,
         'Giro Acelerometro 1 Y': gyValuesAcc1,
         'Giro Acelerometro 1 Z': gzValuesAcc1,

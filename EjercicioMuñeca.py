@@ -21,11 +21,10 @@ bus = smbus.SMBus(1)
 Device_Address1 = 0x68
 Device_Address2 = 0x69
 
-
 idsession=8
-
 contador=0
 now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 # Registros de MPU6050 y las direcciones asociadas a cada uno.
 powerManagementRegister = 0x6B
 sampleRateDividerRegister = 0x19
@@ -61,7 +60,6 @@ aXValuesAcc2 = []
 ayValuesAcc2 = []
 azValuesAcc2 = []
 
-
 # Funcion que establece la conexion con Thingsboard y crea un objeto cliente.
 def on_publish(client,userdata,result):
     print("data published to thingsboard \n")
@@ -70,7 +68,6 @@ client1= paho.Client("control1")
 client1.on_publish = on_publish
 client1.username_pw_set(ACCESS_TOKEN)
 client1.connect(broker,port,keepalive=60)
-
 
 # Funcion que realiza la escritura en los registros de ambos acelerometros
 def MPU_Init():
@@ -126,7 +123,6 @@ def threadDelayFunction():
 def insertExerciseSession(idExerciseSession,idUser,idSessionType,date):
     query = "INSERT INTO SesionEjercicio(idSesionEjercicio,idUsuario,idTipoSesion,fecha)" \
             "VALUES(%s,%s,%s,%s)"
-    
     args = (idExerciseSession,idUser,idSessionType,date)
 
     try:
@@ -143,10 +139,9 @@ def insertExerciseSession(idExerciseSession,idUser,idSessionType,date):
         cursor.close()
         conn.close()
 
-# Funcion que inserta en la base de datos una nueva ejercicio de muñeca     
+# Funcion que inserta en la base de datos los datos de una sesion de ejercicio de muñeca     
 def insertDataWrist(idExerciseSession,data1,data2):
     query = "INSERT INTO Muneca(idSesionEjercicio,giroscopio1Z,giroscopio2X)VALUES(%s,%s,%s)"
-    
     args = (idExerciseSession,data1,data2)
 
     try:
@@ -266,12 +261,10 @@ while(isTimeLimit == False):
            "Aceleracion Acelerometro 2 Z = %.2f g\n\n" %Az2)
     time.sleep(0.05)
 
-
 if (isTimeLimit == True): 
     IO.output(15, False)
     IO.output(7, False)
     print('El ejercicio ha finalizado')
-
      
 data = {'Giro Acelerometro 1 X': gxValuesAcc1,
         'Giro Acelerometro 1 Y': gyValuesAcc1,
@@ -290,7 +283,7 @@ df = pd.DataFrame(data, columns = ['Giro Acelerometro 1 X', 'Giro Acelerometro 1
                                    'Giro Acelerometro 2 X', 'Giro Acelerometro 2 Y', 'Giro Acelerometro 2 Z',
                                    'Aceleracion Acelerometro 1 X', 'Aceleracion Acelerometro 1 Y', 'Aceleracion Acelerometro 1 Z',
                                    'Aceleracion Acelerometro 2 X', 'Aceleracion Acelerometro 2 Y', 'Aceleracion Acelerometro 2 Z'])
-#df.to_excel('dataExercise.xlsx', sheet_name='example')
+df.to_excel('dataExercise.xlsx', sheet_name='example')
 
 if (np.min(gzValuesAcc1) > -2.6 and np.max(gzValuesAcc1) < 3 and 
     np.min(gxValuesAcc2) > -4.75 and np.max(gxValuesAcc2) < 5.2): 
