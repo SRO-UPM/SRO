@@ -124,62 +124,43 @@ def threadDelayFunction():
     time.sleep(20)
     isTimeLimit = True
 
+# Funciones para determinar la distancia
 def distance():
-    # set Trigger to HIGH
     IO.output(37, True)
- 
-    # set Trigger after 0.01ms to LOW
     time.sleep(0.00001)
     IO.output(37, False)
- 
     StartTime = time.time()
     StopTime = time.time()
  
-    # save StartTime
     while IO.input(33) == 0:
         StartTime = time.time()
-        
-    # save time of arrival
     
     while IO.input(33) == 1:
         StopTime = time.time()
  
-    # time difference between start and arrival
     TimeElapsed = StopTime - StartTime
-    # multiply with the sonic speed (34300 cm/s)
-    # and divide by 2, because there and back
     distance = (TimeElapsed * 34300) / 2
- 
     return distance
 
 def distance2():
-    # set Trigger to HIGH
     IO.output(38, True)
- 
-    # set Trigger after 0.01ms to LOW
     time.sleep(0.00001)
     IO.output(38, False)
  
     StartTime = time.time()
     StopTime = time.time()
  
-    # save StartTime
     while IO.input(40) == 0:
         StartTime = time.time()
-        
-    # save time of arrival
     
     while IO.input(40) == 1:
         StopTime = time.time()
  
-    # time difference between start and arrival
     TimeElapsed = StopTime - StartTime
-    # multiply with the sonic speed (34300 cm/s)
-    # and divide by 2, because there and back
     distance2 = (TimeElapsed * 34300) / 2
- 
     return distance2        
 
+# Funcion que inserta en la base de datos una nueva sesion de ejercicio
 def insertExerciseSession(idExerciseSession,idUser,idSessionType,date):
     query = "INSERT INTO SesionEjercicio(idSesionEjercicio,idUsuario,idTipoSesion,fecha)" \
             "VALUES(%s,%s,%s,%s)"
@@ -199,7 +180,8 @@ def insertExerciseSession(idExerciseSession,idUser,idSessionType,date):
     finally:
         cursor.close()
         conn.close()
-        
+
+# Funcion que inserta en la base de datos los datos de una sesion de ejercicio de hombro        
 def insertDataShoulder(idExerciseSession,data1,data2,data3,data4):
     query = "INSERT INTO Hombro(idSesionEjercicio,minDistanciaIzq,minDistanciaDer,yRotationIzq,yRotationDer) VALUES(%s,%s,%s,%s,%s)"
     
